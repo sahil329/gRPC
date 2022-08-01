@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "./pb/go;gen";
+option java_package = "./pb/java";
+
+message Dummy {
+    uint32 id = 1;
+}

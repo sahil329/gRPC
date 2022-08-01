@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "./pb/go;gen";
+option java_package = "./pb/java";
+
+enum EyeColor {
+    // Remember enum range start from 0... unlike tags(it's from 1)
+    EYE_COLOR_UNSPECIFIED = 0;
+    EYE_COLOR_BLACK = 1;
+    EYE_COLOR_BLUE = 2;
+}
+
+/**
+    Account:
+        Used for storing data of person.
+*/
+message Account {
+    // type name = Tag;  tags are mainly used while serialization and de-S not name REMEMBER.
+    // Tags range between - [1 - 53,68,70,911]
+    // Google Reserved tags - [19,000 - 19,999]
+
+    // Tags size allocation
+    /**
+        1-15 -> 1 byte
+        16-2047 -> 2 byte
+        ...
+    */
+    // So use small tag number for most "used/important" field in schema
+
+    uint32 id = 1;          
+    string name = 2;        
+    bytes thumbnail = 3;    
+    bool isVarified = 4;
+    float height = 5; 
+
+    // For list we can use repeated
+    repeated string phones = 6;
+
+    // Enums
+    EyeColor eyeColor = 7;
+}

@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "./pb/go;gen";
+option java_package = "./pb/java";
+
+message Simple {
+    uint32 id = 1;
+    string name = 2;
+}
+
+message Complex {
+    Simple single = 1;
+    repeated Simple multiple = 2;
+    // map<int32,int32> map = 3;
+}

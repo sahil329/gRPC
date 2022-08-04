@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "Calculator/proto/pb;gen";
+
+import "proto/sum.proto";    // It must we start from pkg/file_name.proto
+
+service CalculatorService {
+    rpc Sum(SumRequest) returns (SumResponse);
+}

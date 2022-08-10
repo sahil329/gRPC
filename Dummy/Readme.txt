@@ -34,6 +34,9 @@ Back-word compatibility
     
     Binary breaking changes(.proto)
         • Removing a field 
+          > to do use, 
+            reserved tag; 
+            reserved "field_name"; // optional
         • Renaming a message
         • Nesting or unnesting a message
         • Changing a field data type (if to incompatible type else not)

@@ -23,6 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CalculatorServiceClient interface {
 	Sum(ctx context.Context, in *SumRequest, opts ...grpc.CallOption) (*SumResponse, error)
+	Multiplication(ctx context.Context, opts ...grpc.CallOption) (CalculatorService_MultiplicationClient, error)
 }
 
 type calculatorServiceClient struct {
@@ -42,11 +43,43 @@ func (c *calculatorServiceClient) Sum(ctx context.Context, in *SumRequest, opts 
 	return out, nil
 }
 
+func (c *calculatorServiceClient) Multiplication(ctx context.Context, opts ...grpc.CallOption) (CalculatorService_MultiplicationClient, error) {
+	stream, err := c.cc.NewStream(ctx, &CalculatorService_ServiceDesc.Streams[0], "/proto.CalculatorService/Multiplication", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &calculatorServiceMultiplicationClient{stream}
+	return x, nil
+}
+
+type CalculatorService_MultiplicationClient interface {
+	Send(*MulRequest) error
+	Recv() (*MulResponse, error)
+	grpc.ClientStream
+}
+
+type calculatorServiceMultiplicationClient struct {
+	grpc.ClientStream
+}
+
+func (x *calculatorServiceMultiplicationClient) Send(m *MulRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *calculatorServiceMultiplicationClient) Recv() (*MulResponse, error) {
+	m := new(MulResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // CalculatorServiceServer is the server API for CalculatorService service.
 // All implementations must embed UnimplementedCalculatorServiceServer
 // for forward compatibility
 type CalculatorServiceServer interface {
 	Sum(context.Context, *SumRequest) (*SumResponse, error)
+	Multiplication(CalculatorService_MultiplicationServer) error
 	mustEmbedUnimplementedCalculatorServiceServer()
 }
 
@@ -56,6 +89,9 @@ type UnimplementedCalculatorServiceServer struct {
 
 func (UnimplementedCalculatorServiceServer) Sum(context.Context, *SumRequest) (*SumResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Sum not implemented")
+}
+func (UnimplementedCalculatorServiceServer) Multiplication(CalculatorService_MultiplicationServer) error {
+	return status.Errorf(codes.Unimplemented, "method Multiplication not implemented")
 }
 func (UnimplementedCalculatorServiceServer) mustEmbedUnimplementedCalculatorServiceServer() {}
 
@@ -88,6 +124,32 @@ func _CalculatorService_Sum_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CalculatorService_Multiplication_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(CalculatorServiceServer).Multiplication(&calculatorServiceMultiplicationServer{stream})
+}
+
+type CalculatorService_MultiplicationServer interface {
+	Send(*MulResponse) error
+	Recv() (*MulRequest, error)
+	grpc.ServerStream
+}
+
+type calculatorServiceMultiplicationServer struct {
+	grpc.ServerStream
+}
+
+func (x *calculatorServiceMultiplicationServer) Send(m *MulResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *calculatorServiceMultiplicationServer) Recv() (*MulRequest, error) {
+	m := new(MulRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // CalculatorService_ServiceDesc is the grpc.ServiceDesc for CalculatorService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -100,6 +162,13 @@ var CalculatorService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _CalculatorService_Sum_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "Multiplication",
+			Handler:       _CalculatorService_Multiplication_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+	},
 	Metadata: "proto/calculator.proto",
 }

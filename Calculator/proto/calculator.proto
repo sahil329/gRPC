@@ -5,7 +5,9 @@ package proto;
 option go_package = "Calculator/proto/pb;gen";
 
 import "proto/sum.proto";    // It must we start from pkg/file_name.proto
+import "proto/mul.proto";
 
 service CalculatorService {
     rpc Sum(SumRequest) returns (SumResponse);
+    rpc Multiplication(stream MulRequest) returns (stream MulResponse);
 }

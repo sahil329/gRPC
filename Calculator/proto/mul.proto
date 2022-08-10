@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "Calculator/proto/pb;gen";
+
+message MulRequest{
+    int64 a = 1;
+    int64 b = 2;
+}
+
+message MulResponse{
+    int64 mult = 1;
+}

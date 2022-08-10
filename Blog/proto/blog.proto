@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "Blog/proto/pb;gen";
+
+import "google/protobuf/empty.proto";
+
+message Blog{
+    string id = 1;  // 'cause of mongoDB string/byte
+    string author_id = 2;
+    string title = 3;
+    string content = 4;
+}
+
+message BlogID{
+    string id = 1;
+}
+
+service BlogService{
+    rpc CreateBlog (Blog) returns (BlogID);
+    rpc ReadBlog (BlogID) returns (Blog);
+    rpc UpdateBlog (Blog) returns (google.protobuf.Empty);
+    rpc DeleteBlog (BlogID) returns (google.protobuf.Empty);
+    rpc ListBlogs (google.protobuf.Empty) returns (stream Blog); 
+}

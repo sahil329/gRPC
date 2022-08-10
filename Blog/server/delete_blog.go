@@ -32,7 +32,7 @@ func (s *Server) DeleteBlog(ctx context.Context, in *pb.BlogID) (*emptypb.Empty,
 	}
 	if res.DeletedCount == 0 {
 		return nil, status.Errorf(
-			codes.Internal,
+			codes.InvalidArgument,
 			"Blog not found !!!",
 		)
 	}
